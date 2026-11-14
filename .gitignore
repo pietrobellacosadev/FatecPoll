@@ -1,0 +1,7 @@
+.env
+test.sqlite
+
+public/uploads/covers/*
+!public/uploads/covers/.gitkeep
+storage/*
+!storage/.gitkeep
