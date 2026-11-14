@@ -1,0 +1,15 @@
+/* FatecPoll — animações (keyframes) usadas por base, componentes e dashboard */
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-up  { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes pop-in   { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes pop-out  { to { opacity: 0; transform: scale(.96); } }
+@keyframes drift    { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(50px, 36px, 0) scale(1.14); } }
+@keyframes float    { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-16px) rotate(var(--r, 0deg)); } }
+@keyframes shine    { to { background-position: 200% center; } }
+@keyframes ping     { 0% { box-shadow: 0 0 0 0 rgba(147, 197, 253, .7); } 100% { box-shadow: 0 0 0 10px rgba(147, 197, 253, 0); } }
+@keyframes bob      { 50% { transform: translateY(6px); } }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, -14px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes ripple   { to { transform: scale(3.4); opacity: 0; } }
+@keyframes select-in { from { opacity: 0; transform: translateY(-8px) scale(.97); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
