@@ -1,0 +1,45 @@
+:root {
+  /* Paleta: azuis, branco, cinzas e pretos */
+  --ink: #0b1220;
+  --ink-2: #1e293b;
+  --ink-soft: #5a667a;
+  --bg: #f3f6fb;
+  --surface: #ffffff;
+  --chip: #e8eef8;
+  --line: #dce4f0;
+
+  --accent: #1d4ed8;
+  --accent-dark: #1e3a8a;
+  --accent-2: #3b82f6;
+  --sky: #93c5fd;
+  --sky-soft: #dbeafe;
+  --night: #0b1220;
+  --night-2: #0f1d44;
+
+  --radius: 18px;
+  --shadow: 0 1px 2px rgba(11, 18, 32, .05), 0 10px 30px rgba(11, 18, 32, .07);
+  --shadow-lg: 0 2px 4px rgba(11, 18, 32, .06), 0 22px 50px rgba(29, 78, 216, .18);
+  --container: 1128px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+
+  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", "Liberation Sans Narrow", "DejaVu Sans Condensed", sans-serif;
+}
+
+/* ===== Tema escuro (alternado pelo botão do cabeçalho; salvo em localStorage) ===== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e6edf7;
+  --ink-2: #cbd5e1;
+  --ink-soft: #94a3b8;
+  --bg: #080e1b;
+  --surface: #0f1a2e;
+  --chip: #16233b;
+  --line: #22324f;
+  --accent: #3b82f6;
+  --accent-dark: #93c5fd;
+  --accent-2: #60a5fa;
+  --sky-soft: #172554;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, .4), 0 22px 50px rgba(0, 0, 0, .5);
+}
