@@ -52,6 +52,26 @@ A participação é simplificada: o público não precisa criar uma conta para v
 - Controle de visibilidade dos resultados.
 - Compartilhamento por link exclusivo e QR Code, com opções de copiar, compartilhar e baixar.
 
+## Como funciona a votação
+
+O fluxo foi pensado para ser simples e reduzir erros:
+
+1. **Acesso:** o participante abre o link ou lê o QR Code da enquete.
+2. **Resposta:** avalia um ou mais jogos ou seleciona uma alternativa.
+3. **Revisão:** confere as respostas antes de enviar.
+4. **Confirmação:** o servidor valida a enquete e as respostas e registra a participação.
+5. **Resultados:** os dados são consolidados para consulta, conforme as permissões definidas para a enquete.
+
+### Voto único por dispositivo
+
+O FatecPoll implementa um mecanismo de controle de participação por dispositivo, sem exigir uma conta do participante. O identificador é gerado e assinado pelo servidor; a verificação ocorre no back-end e a restrição é reforçada por uma chave única no banco de dados por enquete e dispositivo.
+
+O registro da participação e das respostas ocorre em uma única transação. Assim, se uma etapa falhar, a operação é revertida.
+
+**Limites importantes:** esse mecanismo busca limitar votos repetidos no mesmo dispositivo/navegador, mas não comprova a identidade de uma pessoa. Outro aparelho, outro navegador, uma sessão anônima ou a remoção de todos os dados locais podem permitir uma nova identificação. O mecanismo não deve ser apresentado como autenticação individual ou garantia absoluta contra fraude. Para eventos que exijam um voto por pessoa, recomenda-se adicionar credenciais individuais ou outro processo de validação.
+
+O sistema também pode registrar sinais técnicos de possível duplicidade para análise administrativa. Esses sinais não identificam diretamente uma pessoa e podem gerar falsos positivos, por exemplo, quando diferentes participantes utilizam aparelhos semelhantes na mesma rede. Por padrão, o comportamento é sinalizar para revisão, não bloquear automaticamente.
+
 ## Requisitos
 
 Para executar com Docker:
