@@ -232,3 +232,9 @@ fatecpoll/
 
 O fluxo de votação registra a participação do dispositivo e impede uma nova participação no mesmo dispositivo, conforme as regras implementadas no serviço de votação e na restrição do banco de dados.
 
+<!-- FATECPOLL-DIA3-TESTES -->
+## Testes
+
+- Teste do QR Code: `node tests/qr.test.js`
+- Teste de fumaça das páginas: `sh tests/smoke.sh` (com o ambiente do projeto em execução).
+
