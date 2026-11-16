@@ -227,4 +227,8 @@ fatecpoll/
 └── README.md
 ```
 
+<!-- FATECPOLL-DIA3-VOTACAO -->
+## Votação
+
+O fluxo de votação registra a participação do dispositivo e impede uma nova participação no mesmo dispositivo, conforme as regras implementadas no serviço de votação e na restrição do banco de dados.
 
