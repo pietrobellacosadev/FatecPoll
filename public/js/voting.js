@@ -100,8 +100,22 @@
 
   function open() {
     if (window.FatecPoll && window.FatecPoll.isDone(slug)) return;
+    if (isCatalog && !allGamesDone()) return;
     goto('form');
     if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+  }
+  // Só libera a revisão geral quando TODOS os jogos foram confirmados.
+  function allGamesDone() {
+    var games = $$('[data-game]');
+    return games.length > 0 && games.every(function (g) { return g.dataset.completed === 'true'; });
+  }
+  function refreshCompletion() {
+    if (!isCatalog) return;
+    var games = $$('[data-game]'), done = games.filter(function (g) { return g.dataset.completed === 'true'; }).length;
+    var finalButton = document.querySelector('[data-catalog-final]');
+    if (finalButton) finalButton.hidden = done !== games.length || !games.length;
+    var progress = document.querySelector('[data-catalog-progress]');
+    if (progress) progress.textContent = done + ' de ' + games.length + ' jogos concluídos.';
   }
   function close() {
     if (sending) return;
@@ -135,7 +149,7 @@
       li.appendChild(name); li.appendChild(notes); summary.appendChild(li);
     });
     if (problem) return showError('Responda as 3 perguntas de cada jogo que você avaliar (jogos incompletos estão destacados).'), false;
-    if (rated === 0) return showError('Avalie ao menos um jogo.'), false;
+    if (rated !== $$('[data-game]').length) return showError('Avalie todos os jogos antes de finalizar a votação.'), false;
     return true;
   }
 
@@ -198,37 +212,46 @@
     function avg() { return (vals.q_time + vals.q_fun + vals.q_replay) / 3; }
     function fmt(n) { return n.toFixed(1).replace('.', ','); }
     function render() {
-      var summary = step === 3;
-      QS.forEach(function (q, i) { qBox(q).hidden = summary || i !== step; paint(q); });
-      el('[data-rate-summary]').hidden = !summary;
+      QS.forEach(function (q, i) { qBox(q).hidden = i !== step; paint(q); });
+      el('[data-rate-summary]').hidden = true;
       dots.forEach(function (d, i) { d.classList.toggle('is-on', i <= step); });
-      el('[data-rate-sub]').textContent = summary ? 'Avaliação geral' : 'Pergunta ' + (step + 1) + ' de 3';
+      el('[data-rate-sub]').textContent = 'Pergunta ' + (step + 1) + ' de 3';
       btnPrev.hidden = step === 0;
-      btnNext.hidden = summary; btnSave.hidden = !summary;
-      if (!summary) {
-        btnNext.disabled = !vals[QS[step]];
-        btnNext.textContent = step === 2 ? 'Ver avaliação geral' : 'Próxima';
-      } else {
-        var a = avg(); el('[data-rate-avg]').textContent = fmt(a); starsOn(el('[data-rate-avg-stars]'), Math.round(a));
-        el('[data-rate-avg-lbl]').textContent = LBL[Math.round(a)] + ' · média das 3 respostas';
-        QS.forEach(function (q) { var m = el('[data-rate-sum="' + q + '"]'); m.innerHTML = el('[data-rate-avg-stars]').innerHTML; starsOn(m, vals[q]); m.setAttribute('aria-label', vals[q] + ' de 5'); });
-      }
+      btnNext.hidden = false; btnSave.hidden = true;
+      btnNext.disabled = !vals[QS[step]];
+      btnNext.textContent = step === 2 ? 'Confirmar jogo' : 'Próxima';
     }
-    function go(n) { clearTimeout(advance); step = n; render(); var f = step < 3 ? qBox(QS[step]).querySelector('.stars__b[tabindex="0"]') : btnSave; if (f) f.focus({ preventScroll: true }); }
+    function go(n) { clearTimeout(advance); step = n; render(); var f = qBox(QS[step]).querySelector('.stars__b[tabindex="0"]'); if (f) f.focus({ preventScroll: true }); }
     function openRate(id) {
       if (window.FatecPoll && window.FatecPoll.isDone(slug)) return;
       var g = gameEl(id); if (!g) return;
-      if (!dialog.open) open();
+      if (g.dataset.completed === 'true') return;
+      // Jogo abre diretamente, sem modal geral ou botão "Iniciar votação".
       curGame = g; vals = {}; editing = false;
       QS.forEach(function (q) { var r = g.querySelector('input[data-q="' + q + '"]:checked'); if (r) vals[q] = +r.value; });
       rateDlg.querySelector('[data-rate-title]').textContent = g.dataset.name;
-      step = QS.every(function (q) { return vals[q]; }) ? 3 : 0; render();
+      step = 0; render();
       if (typeof rateDlg.showModal === 'function') rateDlg.showModal(); else rateDlg.setAttribute('open', '');
     }
     function closeRate() { clearTimeout(advance); if (typeof rateDlg.close === 'function') rateDlg.close(); else rateDlg.removeAttribute('open'); curGame = null; }
     function choose(q, v, auto) {
       vals[q] = v; render();
-      if (auto) { clearTimeout(advance); advance = setTimeout(function () { if (step < 3 && vals[QS[step]]) go(editing ? 3 : step + 1); }, 450); }
+      // Não confirmar automaticamente a última resposta: confirmação explícita por jogo.
+      if (auto && step < 2) { clearTimeout(advance); advance = setTimeout(function () { if (vals[QS[step]]) go(step + 1); }, 450); }
+    }
+    function confirmGame() {
+      if (!curGame || !QS.every(function (q) { return vals[q] >= 1 && vals[q] <= 5; })) return;
+      QS.forEach(function (q) {
+        $$('input[data-q="' + q + '"]', curGame).forEach(function (r) { r.checked = +r.value === vals[q]; });
+      });
+      curGame.dataset.completed = 'true';
+      curGame.classList.remove('is-incomplete');
+      paintRow(curGame);
+      var card = document.querySelector('[data-rate-card="' + curGame.dataset.id + '"]');
+      if (card) { card.disabled = true; card.textContent = 'Concluído'; }
+      var row = curGame.querySelector('[data-rate-open]');
+      if (row) { row.disabled = true; row.setAttribute('aria-label', curGame.dataset.name + ' concluído'); }
+      clearError(); closeRate(); refreshCompletion();
     }
     function paintRow(g) {
       var row = g.querySelector('.rate-row'), st = g.querySelector('[data-rate-status]');
@@ -243,11 +266,9 @@
       if (b) { choose(b.closest('[data-rate-q]').dataset.rateQ, +b.dataset.v, true); return; }
       if (ev.target.closest('[data-rate-cancel]') || ev.target === rateDlg) return closeRate();
       if (ev.target.closest('[data-rate-prev]')) return go(Math.max(0, step - 1));
-      if (ev.target.closest('[data-rate-next]')) return go(editing ? 3 : step + 1);
-      var ed = ev.target.closest('[data-rate-edit]'); if (ed) { editing = true; return go(QS.indexOf(ed.dataset.rateEdit)); }
-      if (ev.target.closest('[data-rate-save]') && curGame) {
-        QS.forEach(function (q) { $$('input[data-q="' + q + '"]', curGame).forEach(function (r) { r.checked = +r.value === vals[q]; }); });
-        curGame.classList.remove('is-incomplete'); paintRow(curGame); clearError(); closeRate();
+      if (ev.target.closest('[data-rate-next]')) {
+        if (!vals[QS[step]]) return;
+        return step === 2 ? confirmGame() : go(step + 1);
       }
     });
     rateDlg.addEventListener('mouseover', function (ev) { var b = ev.target.closest('.stars__b'); if (b) paint(b.closest('[data-rate-q]').dataset.rateQ, +b.dataset.v); });
@@ -271,6 +292,7 @@
     if (ev.target.closest('[data-vote-close]')) close();
   });
   btnReview.addEventListener('click', function () { clearError(); if (buildSummary()) goto('review'); });
+  refreshCompletion();
   btnBack.addEventListener('click', function () { goto('form'); });
   form.addEventListener('submit', send);
   form.addEventListener('change', clearError);

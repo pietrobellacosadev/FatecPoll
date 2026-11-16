@@ -55,7 +55,12 @@
 
   <?php if ($isOpen && $items && !$hasVoted): ?>
     <div class="center-actions">
-      <button class="btn btn--lg" type="button" data-vote-open><?= icon('thumbs-up', 18) ?> Iniciar votação</button>
+      <?php if ($poll['type'] === 'catalog'): ?>
+        <button class="btn btn--lg" type="button" data-vote-open data-catalog-final hidden><?= icon('thumbs-up', 18) ?> Revisar e enviar votação</button>
+        <p data-catalog-progress role="status" aria-live="polite">Avalie todos os jogos para liberar o envio final.</p>
+      <?php else: ?>
+        <button class="btn btn--lg" type="button" data-vote-open><?= icon('thumbs-up', 18) ?> Iniciar votação</button>
+      <?php endif; ?>
     </div>
   <?php endif; ?>
   <?php if ((int) $poll['results_public'] && !$isOpen): ?>
@@ -75,7 +80,7 @@
     <div class="vote-body">
       <div data-step="form">
         <?php if ($isCatalog): ?>
-          <p class="vote-hint">Toque em um jogo para avaliar com estrelas (1 a 5). Avalie quantos quiser; cada jogo avaliado tem 3 perguntas.</p>
+          <p class="vote-hint">Todos os jogos são obrigatórios. Escolha cada jogo na lista, responda às três perguntas e confirme. Depois revise o resumo geral.</p>
           <ul class="rate-list">
           <?php foreach ($items as $it): ?>
             <li>
@@ -147,7 +152,7 @@
           <small class="rate-q__lbl" data-rate-lbl>&nbsp;</small>
         </div>
       <?php endforeach; ?>
-      <div class="rate-summary" data-rate-summary hidden>
+      <div class="rate-summary" data-rate-summary hidden aria-hidden="true">
         <div class="rate-summary__score">
           <strong data-rate-avg>0,0</strong>
           <span class="rate-summary__stars" data-rate-avg-stars><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
