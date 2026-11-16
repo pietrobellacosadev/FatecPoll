@@ -52,18 +52,25 @@ A participação é simplificada: o público não precisa criar uma conta para v
 - Controle de visibilidade dos resultados.
 - Compartilhamento por link exclusivo e QR Code, com opções de copiar, compartilhar e baixar.
 
-## Tecnologias
+## Como funciona a votação
 
-| Camada | Tecnologias |
-|---|---|
-| Back-end | PHP 8.3, arquitetura própria com roteador e autoload |
-| Banco de dados | MariaDB, InnoDB, PDO e consultas parametrizadas |
-| Front-end | HTML5, CSS3 e JavaScript ES6+ |
-| Gráficos | Apache ECharts 5.5.1 |
-| Infraestrutura | Docker, Docker Compose e Apache |
-| E-mail | SMTP ou Mailpit para desenvolvimento |
+O fluxo foi pensado para ser simples e reduzir erros:
 
-O projeto utiliza CSS e JavaScript próprios para a interface e as interações. O Apache ECharts é utilizado na apresentação dos gráficos.
+1. **Acesso:** o participante abre o link ou lê o QR Code da enquete.
+2. **Resposta:** avalia um ou mais jogos ou seleciona uma alternativa.
+3. **Revisão:** confere as respostas antes de enviar.
+4. **Confirmação:** o servidor valida a enquete e as respostas e registra a participação.
+5. **Resultados:** os dados são consolidados para consulta, conforme as permissões definidas para a enquete.
+
+### Voto único por dispositivo
+
+O FatecPoll implementa um mecanismo de controle de participação por dispositivo, sem exigir uma conta do participante. O identificador é gerado e assinado pelo servidor; a verificação ocorre no back-end e a restrição é reforçada por uma chave única no banco de dados por enquete e dispositivo.
+
+O registro da participação e das respostas ocorre em uma única transação. Assim, se uma etapa falhar, a operação é revertida.
+
+**Limites importantes:** esse mecanismo busca limitar votos repetidos no mesmo dispositivo/navegador, mas não comprova a identidade de uma pessoa. Outro aparelho, outro navegador, uma sessão anônima ou a remoção de todos os dados locais podem permitir uma nova identificação. O mecanismo não deve ser apresentado como autenticação individual ou garantia absoluta contra fraude. Para eventos que exijam um voto por pessoa, recomenda-se adicionar credenciais individuais ou outro processo de validação.
+
+O sistema também pode registrar sinais técnicos de possível duplicidade para análise administrativa. Esses sinais não identificam diretamente uma pessoa e podem gerar falsos positivos, por exemplo, quando diferentes participantes utilizam aparelhos semelhantes na mesma rede. Por padrão, o comportamento é sinalizar para revisão, não bloquear automaticamente.
 
 ## Requisitos
 
@@ -184,5 +191,40 @@ Em ambiente local, quando `APP_KEY` está vazia, a aplicação cria e utiliza `s
 No Docker, o envio é direcionado por padrão ao Mailpit. Consulte as mensagens em http://localhost:8025. Para envio real, configure um servidor SMTP no `.env`, utilizando uma senha de aplicativo quando o provedor exigir.
 
 Sem SMTP, a aplicação também pode ser configurada para registrar mensagens localmente, conforme o `MAIL_DRIVER` e as opções de configuração.
+
+## Estrutura do projeto
+
+```text
+fatecpoll/
+├── app/
+│   ├── Controllers/       # Controladores das rotas públicas e administrativas
+│   ├── Core/              # Roteador e conexão com o banco
+│   ├── Models/            # Entidades e operações de domínio
+│   ├── Services/          # Votação, identificação, ranking e e-mail
+│   ├── bootstrap.php      # Inicialização da aplicação
+│   ├── config.php         # Configurações
+│   └── helpers.php        # Funções auxiliares
+├── database/
+│   ├── migrations/        # Schema e migrações SQL
+│   └── seed.php           # Migrações incrementais e dados iniciais
+├── docker/                # Configuração do Apache e inicialização
+├── docs/                  # Documentação complementar
+├── public/
+│   ├── css/               # Estilos, componentes, temas e animações
+│   ├── js/                # Interações, votação, gráficos e QR Code
+│   ├── img/               # Logotipo e ícones
+│   ├── uploads/            # Capas enviadas para os jogos
+│   └── index.php          # Ponto de entrada HTTP
+├── tests/                 # Testes automatizados e de fumaça
+├── views/
+│   ├── admin/             # Telas administrativas
+│   ├── auth/              # Cadastro e verificação
+│   ├── partials/          # Componentes reutilizáveis
+│   └── public/            # Telas públicas
+├── .env.example           # Exemplo de configuração
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
 
 
