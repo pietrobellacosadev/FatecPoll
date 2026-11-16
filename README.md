@@ -238,3 +238,8 @@ O fluxo de votação registra a participação do dispositivo e impede uma nova 
 - Teste do QR Code: `node tests/qr.test.js`
 - Teste de fumaça das páginas: `sh tests/smoke.sh` (com o ambiente do projeto em execução).
 
+<!-- FATECPOLL-VIDEO-DEMO -->
+## Demonstração em vídeo
+
+Assista à demonstração do FatecPoll: [vídeo demonstrativo (MP4)](docs/media/FatecPoll-demo.mp4).
+
