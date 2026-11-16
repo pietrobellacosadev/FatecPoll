@@ -28,6 +28,12 @@ final class PollController
             return;
         }
 
+        if (is_admin()) {
+            http_response_code(403);
+            view('public/404', ['title' => 'Votação indisponível para usuários administrativos']);
+            return;
+        }
+
         // Identifica o dispositivo (cookie assinado, persistente) e consulta no servidor se ele já votou.
         $device = Device::resolve();
         Device::remember($device['token']);
@@ -56,6 +62,11 @@ final class PollController
         if (!$poll) {
             http_response_code(404);
             echo json_encode(['voted' => false]);
+            return;
+        }
+        if (is_admin()) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Acesso não permitido.']);
             return;
         }
         $device = Device::resolve();

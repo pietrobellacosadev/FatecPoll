@@ -14,6 +14,14 @@ final class VoteController
     {
         $wantsJson = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch';
 
+        // Usuários autenticados no painel (admin ou professor) não podem votar.
+        // A validação é obrigatória no backend, mesmo em requisições manuais.
+        if (is_admin()) {
+            $this->respond($wantsJson, $slug, ['ok' => false, 'status' => 403,
+                'errors' => ['Administradores e professores não podem participar da votação.']]);
+            return;
+        }
+
         if (!csrf_valid()) {
             $this->respond($wantsJson, $slug, ['ok' => false, 'status' => 419, 'errors' => ['Sessão expirada. Recarregue a página e tente de novo.']]);
             return;
