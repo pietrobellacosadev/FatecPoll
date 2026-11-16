@@ -24,13 +24,19 @@ echo "VotingService::sanitize — catálogo\n";
 $ids = [10, 11, 12];
 
 $r = VotingService::sanitize('catalog', $ids, ['ratings' => [10 => ['q_time' => '5', 'q_fun' => '4', 'q_replay' => '3']]]);
-check('aceita um jogo com as 3 notas', !$r['errors'] && $r['data']['ratings'][10] === ['q_time' => 5, 'q_fun' => 4, 'q_replay' => 3]);
+check('recusa envio com somente um de três jogos', (bool) $r['errors']);
+$r = VotingService::sanitize('catalog', $ids, ['ratings' => [
+    10 => ['q_time' => 5, 'q_fun' => 4, 'q_replay' => 3],
+    11 => ['q_time' => 4, 'q_fun' => 4, 'q_replay' => 4],
+    12 => ['q_time' => 3, 'q_fun' => 5, 'q_replay' => 4],
+]]);
+check('aceita todos os jogos completos', !$r['errors'] && count($r['data']['ratings']) === 3);
 
 $r = VotingService::sanitize('catalog', $ids, ['ratings' => [
     10 => ['q_time' => 1, 'q_fun' => 1, 'q_replay' => 1],
     11 => ['q_time' => '', 'q_fun' => '', 'q_replay' => ''],
 ]]);
-check('ignora jogo não avaliado', !$r['errors'] && array_keys($r['data']['ratings']) === [10]);
+check('recusa jogo obrigatório não avaliado', (bool) $r['errors']);
 
 $r = VotingService::sanitize('catalog', $ids, ['ratings' => [10 => ['q_time' => 5, 'q_fun' => 4]]]);
 check('recusa jogo com notas incompletas', (bool) $r['errors']);

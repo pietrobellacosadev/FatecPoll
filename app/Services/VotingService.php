@@ -74,8 +74,10 @@ final class VotingService
             }
             $ratings[$gid] = $row;
         }
-        if (!$errors && !$ratings) {
-            $errors[] = 'Avalie ao menos um jogo.';
+        // A participação só pode ser finalizada quando todos os jogos ativos
+        // da enquete estiverem completos; nunca confiar apenas no JavaScript.
+        if (!$errors && count($ratings) !== count($valid)) {
+            $errors[] = 'Avalie todos os jogos antes de finalizar a votação.';
         }
         return ['data' => ['ratings' => $ratings], 'errors' => array_values(array_unique($errors))];
     }
