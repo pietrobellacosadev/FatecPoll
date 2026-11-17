@@ -1,0 +1,70 @@
+/* Painel (professores e administração): subnavegação, abas da enquete, menu dos cards e lista de professores.
+   Usa só os tokens de variables.css, então acompanha o tema claro/escuro. */
+
+/* ===== Barra do painel (abaixo do cabeçalho) ===== */
+.admin-bar { display: flex; align-items: center; justify-content: space-between; gap: .8rem 1rem; flex-wrap: wrap; margin: 0 0 1.8rem; padding-bottom: .9rem; border-bottom: 1px solid var(--line); }
+.admin-bar__tabs { display: flex; gap: .25rem; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.admin-bar__tabs::-webkit-scrollbar { display: none; }
+.admin-bar__tabs a { padding: .45rem 1rem; border-radius: 999px; text-decoration: none; color: var(--ink-2); font-weight: 600; font-size: .94rem; white-space: nowrap; transition: background .2s, color .2s; }
+.admin-bar__tabs a:hover { background: var(--chip); }
+.admin-bar__tabs a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+:root[data-theme="dark"] .admin-bar__tabs a[aria-current="page"] { background: var(--accent); color: #fff; }
+
+/* ===== Abas dentro de uma enquete: Resultados · Compartilhar · Editar ===== */
+.poll-tabs { display: flex; align-items: center; justify-content: space-between; gap: .5rem 1rem; flex-wrap: wrap; margin: 0 0 1.6rem; border-bottom: 1px solid var(--line); }
+.poll-tabs__list { display: flex; gap: .2rem; overflow-x: auto; scrollbar-width: none; }
+.poll-tabs__list::-webkit-scrollbar { display: none; }
+.poll-tabs a { display: inline-block; padding: .65rem 1rem; text-decoration: none; font-weight: 600; color: var(--ink-soft); border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color .2s, border-color .2s; }
+.poll-tabs a:hover { color: var(--ink); }
+.poll-tabs a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+.poll-tabs__back { font-size: .9rem; padding: .65rem 0 !important; }
+
+/* ===== Menu "Mais" dos cards ===== */
+.card-menu { position: relative; }
+.card-menu > summary { list-style: none; cursor: pointer; user-select: none; }
+.card-menu > summary::-webkit-details-marker { display: none; }
+.card-menu[open] > summary { background: var(--chip); }
+.card-menu__list { position: absolute; right: 0; bottom: calc(100% + .45rem); z-index: 20; min-width: 12.5rem; display: flex; flex-direction: column; gap: .1rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-lg); padding: .35rem; animation: menu-in .14s var(--ease); }
+.card-menu__list form { margin: 0; }
+.card-menu__list a, .card-menu__list button { display: block; width: 100%; text-align: left; padding: .5rem .75rem; border: 0; border-radius: 9px; background: none; color: var(--ink);
+  font: inherit; font-size: .92rem; font-weight: 500; text-decoration: none; cursor: pointer; }
+.card-menu__list a:hover, .card-menu__list button:hover, .card-menu__list a:focus-visible, .card-menu__list button:focus-visible { background: var(--chip); outline: none; }
+.card-menu__list .is-danger { color: #b91c1c; }
+:root[data-theme="dark"] .card-menu__list .is-danger { color: #fca5a5; }
+@keyframes menu-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ===== Lista de professores: uma linha por professor ===== */
+.tools { display: flex; align-items: center; justify-content: space-between; gap: .8rem 1.2rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.tools .chips-bar { margin: 0; justify-content: flex-start; }
+.tools__search { flex: 1 1 15rem; max-width: 22rem; }
+.tools__search .input { width: 100%; }
+.tlist { padding: .3rem 1.2rem; }
+.trow { padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.trow:last-child { border-bottom: 0; }
+.trow[hidden] { display: none; }
+.trow__main { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: .6rem 1.4rem; }
+.trow__id { min-width: 0; display: flex; flex-direction: column; gap: .1rem; }
+.trow__id strong { font-size: 1.02rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trow__id small { color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trow__nums { display: flex; align-items: center; gap: 1rem; color: var(--ink-soft); font-size: .9rem; white-space: nowrap; }
+.trow__nums b { color: var(--ink); font-size: 1.05rem; }
+.trow__actions { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; }
+.trow__actions form { margin: 0; }
+.trow__polls { margin-top: .7rem; }
+.trow__polls > summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; list-style: none; width: fit-content; }
+.trow__polls > summary::-webkit-details-marker { display: none; }
+.trow__polls > summary::after { content: " ▾"; }
+.trow__polls[open] > summary::after { content: " ▴"; }
+.trow__polls ul { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .4rem; }
+.trow__polls li { display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap; background: var(--chip); border-radius: 12px; padding: .55rem .8rem; }
+.trow__polls li div { min-width: 0; display: flex; flex-direction: column; }
+.trow__polls li small { color: var(--ink-soft); }
+.trow__polls li > span { display: flex; gap: .4rem; }
+.trow__none { color: var(--ink-soft); font-size: .9rem; margin: .5rem 0 0; }
+@media (max-width: 760px) {
+  .trow__main { grid-template-columns: 1fr auto; }
+  .trow__nums { grid-column: 1 / -1; order: 3; }
+  .trow__actions { grid-column: 1 / -1; order: 4; justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { .card-menu__list { animation: none; } }

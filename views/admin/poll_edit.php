@@ -4,8 +4,9 @@ $items = $items ?: ($isCatalog ? [[]] : [[], []]);
 while (!$isCatalog && count($items) < 2) { $items[] = []; }
 require __DIR__ . '/_item_blocks.php';
 ?>
+<?php $tab = 'edit'; include BASE_PATH . '/views/partials/poll_tabs.php'; ?>
 <div class="page-head">
-  <span class="eyebrow">Administração</span>
+  <span class="eyebrow">Painel</span>
   <h1><?= $isCatalog ? 'Editar catálogo' : 'Editar enquete' ?></h1>
   <p>O link público desta enquete não muda ao editar.</p>
   <?php $publicLink = absolute_url('/e/' . $poll['slug']); ?>

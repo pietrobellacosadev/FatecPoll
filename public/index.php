@@ -21,6 +21,7 @@ use App\Controllers\VoteController;
 use App\Controllers\ResultController;
 use App\Controllers\TeacherAuthController;
 use App\Controllers\AuthorController;
+use App\Controllers\UsersAdminController;
 
 $router = new Router();
 
@@ -56,5 +57,7 @@ $router->post('/admin/enquetes/{id}/publicar', [PollAdminController::class, 'pub
 $router->post('/admin/enquetes/{id}/encerrar', [PollAdminController::class, 'close']);
 $router->get('/admin/enquetes/{id}/resultados', [PollAdminController::class, 'results']);
 $router->get('/admin/enquetes/{id}/compartilhar', [PollAdminController::class, 'share']);
+$router->get('/admin/professores', [UsersAdminController::class, 'index']);
+$router->post('/admin/professores/{id}/status', [UsersAdminController::class, 'status']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');

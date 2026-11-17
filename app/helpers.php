@@ -60,15 +60,18 @@ function csrf_field(): string
 
 function csrf_valid(): bool
 {
-    $sent = $_POST['_csrf'] ?? '';
-    return is_string($sent) && hash_equals($_SESSION['csrf'] ?? '', $sent);
+    $sent  = $_POST['_csrf'] ?? '';
+    $known = $_SESSION['csrf'] ?? '';
+    // Token vazio nunca é válido (hash_equals('', '') seria verdadeiro numa sessão que ainda não gerou token)
+    return is_string($sent) && is_string($known) && $known !== '' && hash_equals($known, $sent);
 }
 
 function csrf_check(): void
 {
     if (!csrf_valid()) {
         http_response_code(419);
-        exit('Sessão expirada ou token inválido. Volte e tente novamente.');
+        view('public/419', ['title' => 'Sessão expirada']);
+        exit;
     }
 }
 
@@ -93,9 +96,34 @@ function view(string $template, array $data = [], string $layout = 'layout'): vo
     require BASE_PATH . '/views/' . $layout . '.php';
 }
 
+/** Conta do painel logada, lida do banco uma vez por requisição (null = sem login, conta removida ou inativada). */
+function admin_account(): ?array
+{
+    static $cache = [];
+    $id = (int) ($_SESSION['admin_id'] ?? 0);
+    if ($id < 1) {
+        return null;
+    }
+    if (!array_key_exists($id, $cache)) {
+        $st = \App\Core\Database::pdo()->prepare('SELECT id, name, role, active FROM admins WHERE id = ? LIMIT 1');
+        $st->execute([$id]);
+        $row = $st->fetch(\PDO::FETCH_ASSOC);
+        $cache[$id] = ($row && (int) $row['active'] === 1) ? $row : null;
+    }
+    return $cache[$id];
+}
+
+/** Há alguém logado no painel E a conta continua ativa. Revoga a sessão se foi inativada ou removida. */
 function is_admin(): bool
 {
-    return !empty($_SESSION['admin_id']);
+    $acc = admin_account();
+    if ($acc) {
+        $_SESSION['admin_name'] = $acc['name'];
+        $_SESSION['admin_role'] = $acc['role'] === 'teacher' ? 'teacher' : 'admin'; // rebaixar o papel vale na hora
+        return true;
+    }
+    unset($_SESSION['admin_id'], $_SESSION['admin_name'], $_SESSION['admin_role']);
+    return false;
 }
 
 /** Papel de quem está logado no painel: 'admin' (vê tudo) ou 'teacher' (só as próprias enquetes). */
@@ -104,9 +132,10 @@ function admin_role(): string
     return ($_SESSION['admin_role'] ?? 'teacher') === 'admin' ? 'admin' : 'teacher';
 }
 
+/** Administrador global. Lê só a sessão (sem consultar o banco): use depois de require_admin()/is_admin(), que já validam a conta. */
 function is_super_admin(): bool
 {
-    return is_admin() && admin_role() === 'admin';
+    return !empty($_SESSION['admin_id']) && admin_role() === 'admin';
 }
 
 function admin_id(): int
@@ -116,9 +145,31 @@ function admin_id(): int
 
 function require_admin(): void
 {
+    $had = !empty($_SESSION['admin_id']);
     if (!is_admin()) {
+        if ($had) {
+            flash('error', 'Seu acesso ao painel foi encerrado. Entre novamente ou fale com a coordenação.');
+        }
         redirect('/admin/login');
     }
+}
+
+/** Só o administrador global; professor logado recebe 403. */
+function require_super_admin(): void
+{
+    require_admin();
+    if (!is_super_admin()) {
+        http_response_code(403);
+        view('public/403', ['title' => 'Acesso restrito']);
+        exit;
+    }
+}
+
+/** Área do painel/cadastro: carrega os scripts de confirmação, trava de duplo clique e menus. */
+function in_admin_area(): bool
+{
+    $p = current_path();
+    return str_starts_with($p, '/admin') || str_starts_with($p, '/cadastro');
 }
 
 /** Caminho atual da requisição, sem a subpasta (para marcar o item ativo do menu). */

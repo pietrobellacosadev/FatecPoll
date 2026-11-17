@@ -237,6 +237,9 @@ O fluxo de votação registra a participação do dispositivo e impede uma nova 
 
 - Teste do QR Code: `node tests/qr.test.js`
 - Teste de fumaça das páginas: `sh tests/smoke.sh` (com o ambiente do projeto em execução).
+- Regras de negócio: `php tests/run.php` (inclui CSRF e escopo professor x administrador).
+- Fluxo ponta a ponta (cadastro, login, papéis, enquetes, votos, inativação de professor): com o site no ar e `MAIL_DRIVER=log`, rode
+  `BASE_URL=http://localhost:8080 MAIL_LOG=storage/mail.log python3 tests/e2e_flow.py` (requer `pip install requests`; cria dados com prefixo "E2E").
 
 <!-- FATECPOLL-VIDEO-DEMO -->
 ## Demonstração em vídeo

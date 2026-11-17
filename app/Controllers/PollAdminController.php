@@ -274,7 +274,8 @@ final class PollAdminController
     /** POST /admin/enquetes/{id}/publicar — publica um rascunho ou reabre uma enquete encerrada. */
     public function publish(string $id): void
     {
-        $this->changeStatus($id, 'published', 'Enquete aberta para votação.');
+        // Publicar leva direto ao próximo passo natural: compartilhar o link
+        $this->changeStatus($id, 'published', 'Enquete aberta para votação. Compartilhe o link com os participantes.', '/compartilhar');
     }
 
     /** POST /admin/enquetes/{id}/encerrar — a página continua acessível, mas novos votos são recusados. */
@@ -283,7 +284,7 @@ final class PollAdminController
         $this->changeStatus($id, 'closed', 'Enquete encerrada.');
     }
 
-    private function changeStatus(string $id, string $new, string $message): void
+    private function changeStatus(string $id, string $new, string $message, string $then = ''): void
     {
         require_admin();
         csrf_check();
@@ -294,7 +295,7 @@ final class PollAdminController
         }
         Database::pdo()->prepare('UPDATE polls SET status = ? WHERE id = ?')->execute([$new, $poll['id']]);
         flash('success', $message);
-        redirect('/admin/enquetes');
+        redirect($then !== '' ? '/admin/enquetes/' . (int) $poll['id'] . $then : '/admin/enquetes');
     }
 
     /** Dados da view de edição: itens atuais (com nº de votos) ou, após erro, o que foi digitado. */
