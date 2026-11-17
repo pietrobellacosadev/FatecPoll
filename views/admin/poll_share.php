@@ -1,5 +1,6 @@
+<?php $tab = 'share'; include BASE_PATH . '/views/partials/poll_tabs.php'; ?>
 <div class="page-head">
-  <span class="eyebrow">Administração</span>
+  <span class="eyebrow">Painel</span>
   <h1>Compartilhar enquete</h1>
   <p><?= e($poll['title']) ?></p>
   <?php if ($poll['status'] === 'draft'): ?><p class="linkbox-note">Esta enquete ainda é um rascunho: o link e o QR Code só funcionam depois de publicar.</p><?php endif; ?>
@@ -8,7 +9,7 @@
 <div class="card share" data-reveal data-share data-title="<?= e($poll['title']) ?>" data-url="<?= e($link) ?>">
   <div>
     <h2>Link exclusivo</h2>
-    <p class="linkbox-note" style="margin-top:0">Qualquer aparelho que abrir este link vê a mesma enquete. Cada participante pode votar uma única vez.</p>
+    <p class="linkbox-note" style="margin-top:0">Qualquer aparelho que abrir este link vê a mesma enquete. Cada aparelho vota uma vez.</p>
     <div class="linkbox" style="margin-top:.4rem">
       <input class="input" type="text" readonly value="<?= e($link) ?>" aria-label="Link público da enquete" onfocus="this.select()">
     </div>

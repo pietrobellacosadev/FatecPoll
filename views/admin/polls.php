@@ -3,10 +3,9 @@ $counts = ['published' => 0, 'draft' => 0, 'closed' => 0];
 foreach ($polls as $p) { $counts[$p['status']] = ($counts[$p['status']] ?? 0) + 1; }
 ?>
 <div class="page-head">
-  <span class="eyebrow">Administração</span>
-  <h1>Enquetes</h1>
+  <span class="eyebrow">Painel</span>
+  <h1><?= is_super_admin() ? 'Todas as enquetes' : 'Minhas enquetes' ?></h1>
   <p><?= is_super_admin() ? 'Todas as enquetes da plataforma, de todos os professores.' : 'Suas votações: você só vê e edita as enquetes que criou.' ?></p>
-  <a class="btn" href="<?= e(url('/admin/enquetes/criar')) ?>"><?= icon('plus', 16) ?> Criar enquete</a>
 </div>
 
 <?php if (!$polls): ?>
