@@ -79,6 +79,20 @@ check('recusa dois @', !$ok('a@evil.com@cps.sp.gov.br'));
 check('recusa vazio', !$ok(''));
 check('normalizeCode só dígitos', \App\Services\TeacherRegistration::normalizeCode('123 456') === '123456');
 
+echo "CSRF — token vazio nunca vale\n";
+$_SESSION = []; $_POST = [];
+check('sem token na sessão e sem token enviado: recusa', !csrf_valid());
+$_POST['_csrf'] = '';
+check('token enviado vazio: recusa', !csrf_valid());
+$_SESSION['csrf'] = 'abc123'; $_POST['_csrf'] = 'errado';
+check('token errado: recusa', !csrf_valid());
+$_POST['_csrf'] = 'abc123';
+check('token certo: aceita', csrf_valid());
+$_POST['_csrf'] = ['abc123'];
+check('token em array: recusa', !csrf_valid());
+$_SESSION = []; $_POST = [];
+check('sem sessão de painel: não é admin', !is_admin() && admin_account() === null);
+
 echo "Poll::canManage / scopeOwner — professor x administrador\n";
 $mine = ['owner_id' => 7]; $other = ['owner_id' => 8]; $orphan = ['owner_id' => null];
 $_SESSION = ['admin_id' => 7, 'admin_role' => 'teacher'];
