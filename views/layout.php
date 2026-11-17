@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="<?= e(url('css/base.css')) ?>">
   <link rel="stylesheet" href="<?= e(url('css/components.css')) ?>">
   <link rel="stylesheet" href="<?= e(url('css/dashboard.css')) ?>">
+  <link rel="stylesheet" href="<?= e(url('css/admin-panel.css')) ?>">
   <link rel="stylesheet" href="<?= e(url('css/animations.css')) ?>">
 </head>
 <body>
@@ -43,8 +44,7 @@
         <a href="<?= e(url('/')) ?>"<?= nav_active('/', true) ?>>Início</a>
         <a href="<?= e(url('/enquetes')) ?>"<?= nav_active('/enquetes') ?>>Enquetes</a>
         <?php if (is_admin()): ?>
-          <a href="<?= e(url('/admin')) ?>"<?= nav_active('/admin', true) ?>>Dashboard</a>
-          <a href="<?= e(url('/admin/enquetes')) ?>"<?= nav_active('/admin/enquetes') ?>>Gerenciar</a>
+          <a href="<?= e(url('/admin')) ?>"<?= nav_active('/admin') ?>>Painel</a>
         <?php endif; ?>
       </nav>
       <div class="header-actions">
@@ -52,7 +52,6 @@
           <span class="theme-toggle__moon"><?= icon('moon', 18) ?></span><span class="theme-toggle__sun"><?= icon('sun', 18) ?></span>
         </button>
         <?php if (is_admin()): ?>
-          <a class="btn btn--sm" href="<?= e(url('/admin/enquetes/criar')) ?>"><?= icon('plus', 16) ?> Criar enquete</a>
           <form method="post" action="<?= e(url('/admin/logout')) ?>">
             <?= csrf_field() ?>
             <button class="btn btn--ghost btn--sm" type="submit">Sair</button>
@@ -69,10 +68,13 @@
   <div class="toast<?= $f['type'] === 'error' ? ' toast--error' : '' ?>" role="status"><?= icon($f['type'] === 'error' ? 'x' : 'check', 18) ?> <?= e($f['message']) ?></div>
 <?php endif; ?>
 
+<?php $panel = is_admin() && str_starts_with(current_path(), '/admin'); ?>
 <?php if ($hero): ?>
 <main><?= $content ?></main>
 <?php else: ?>
-<main class="container page"><?= $content ?></main>
+<main class="container page">
+<?php if ($panel) { include BASE_PATH . '/views/partials/admin_bar.php'; } ?>
+<?= $content ?></main>
 <?php endif; ?>
 
 <footer class="site-footer">
@@ -80,7 +82,7 @@
     <a class="brand" href="<?= e(url('/')) ?>"><span class="brand__mark brand__mark--logo"><img src="<?= e(url('img/logo.png')) ?>" alt="" width="36" height="36"></span><span>Fatec<b>Poll</b></span></a>
     <div class="site-footer__bottom">
       <small class="copyright">&copy; FP Softwares. Todos os direitos reservados. <span aria-hidden="true">&middot;</span> <a href="<?= e(url('/autores')) ?>">Autores</a></small>
-      <small class="copyright">Votos anônimos: o voto não é ligado a você. Guardamos só um identificador anônimo do aparelho para garantir um voto por participante.</small>
+      <small class="copyright">Votos anônimos: o voto não é ligado a você. Para limitar votos repetidos, guardamos só um identificador anônimo do aparelho.</small>
     </div>
   </div>
 </footer>
@@ -91,6 +93,7 @@
 <?php endif; ?>
 <script src="<?= e(url('js/app.js')) ?>"></script>
 <?php if (!empty($withCharts)): ?><script src="<?= e(url('js/charts.js')) ?>" defer></script><?php endif; ?>
+<?php if (in_admin_area()): ?><script src="<?= e(url('js/admin-actions.js')) ?>"></script><?php endif; ?>
 <?php if (!empty($extraJs)) { foreach ($extraJs as $js) { echo '<script src="' . e(url('js/' . $js)) . '"></script>' . "\n"; } } ?>
 </body>
 </html>

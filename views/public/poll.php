@@ -10,7 +10,7 @@
 <?php endif; ?>
 
 <div id="already-voted" class="alert alert--success" style="max-width:640px;margin-inline:auto"<?= $hasVoted ? '' : ' hidden' ?>>
-  Você já votou nesta enquete. Cada participante pode votar uma única vez. Obrigado!
+  Você já votou nesta enquete neste aparelho. Obrigado!
 </div>
 <?php if ($hasVoted && (int) $poll['results_public']): ?>
   <div class="center-actions"><a class="btn btn--outline" href="<?= e(url('/resultados/' . $poll['slug'])) ?>"><?= icon('bars', 16) ?> Ver resultados</a></div>
